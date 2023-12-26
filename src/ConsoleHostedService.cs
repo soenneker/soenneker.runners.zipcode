@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -15,17 +15,19 @@ public class ConsoleHostedService : IHostedService
 
     private readonly IHostApplicationLifetime _appLifetime;
     private readonly IFileOperationsUtil _fileOperationsUtil;
-    private readonly IDownloadUtil _downloadUtil;
+    private readonly IExcelFileReaderUtil _excelFileReaderUtil;
+    private readonly IUspsDownloadUtil _uspsDownloadUtil;
 
     private int? _exitCode;
 
     public ConsoleHostedService(ILogger<ConsoleHostedService> logger, IHostApplicationLifetime appLifetime, 
-        IFileOperationsUtil fileOperationsUtil,IDownloadUtil downloadUtil)
+        IFileOperationsUtil fileOperationsUtil,IExcelFileReaderUtil excelFileReaderUtil, IUspsDownloadUtil uspsDownloadUtil)
     {
         _logger = logger;
         _appLifetime = appLifetime;
         _fileOperationsUtil = fileOperationsUtil;
-        _downloadUtil = downloadUtil;
+        _excelFileReaderUtil = excelFileReaderUtil;
+        _uspsDownloadUtil = uspsDownloadUtil;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -38,9 +40,10 @@ public class ConsoleHostedService : IHostedService
 
                 try
                 {
-                    string filePath = await _downloadUtil.Download();
+                    string fileName = await _uspsDownloadUtil.Download();
+                    HashSet<string> hashSet = _excelFileReaderUtil.GetZipCodesFromXls(fileName);
 
-                    await _fileOperationsUtil.Process(filePath);
+                    await _fileOperationsUtil.Process(hashSet);
 
                     _logger.LogInformation("Complete!");
 

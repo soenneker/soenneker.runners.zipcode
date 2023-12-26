@@ -30,7 +30,8 @@ public class Startup
         services.AddFileUtilSyncAsScoped();
         services.AddGitUtilAsScoped();
         services.AddSha3UtilAsScoped();
-        services.AddScoped<IDownloadUtil, DownloadUtil>();
+        services.AddScoped<IExcelFileReaderUtil, ExcelFileReaderUtil>();
+        services.AddScoped<IUspsDownloadUtil, UspsDownloadUtil>();
         services.AddScoped<IFileOperationsUtil, FileOperationsUtil>();
         services.AddDotnetNuGetUtilAsScoped();
         services.AddDotnetUtilAsScoped();

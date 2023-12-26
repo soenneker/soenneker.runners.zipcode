@@ -2,6 +2,6 @@ namespace Soenneker.Runners.ZipCode;
 
 public static class Constants
 {
-    public const string FileName = "yt-dlp.exe";
-    public const string Library = "Soenneker.Libraries.ytdlp";
+    public const string FileName = "zipcodes.txt";
+    public const string Library = "Soenneker.Data.ZipCode";
 }

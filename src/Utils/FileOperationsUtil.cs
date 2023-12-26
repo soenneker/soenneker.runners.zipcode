@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -9,7 +10,7 @@ using Soenneker.Utils.Dotnet.NuGet.Abstract;
 using Soenneker.Utils.Environment;
 using Soenneker.Utils.File.Abstract;
 using Soenneker.Utils.FileSync.Abstract;
-using Soenneker.Utils.SHA3;
+using Soenneker.Utils.SHA3.Abstract;
 
 namespace Soenneker.Runners.ZipCode.Utils;
 
@@ -40,29 +41,38 @@ public class FileOperationsUtil : IFileOperationsUtil
         _sha3Util = sha3Util;
     }
 
-    public async ValueTask Process(string filePath)
+    public async ValueTask Process(HashSet<string> hashSet)
     {
-        string gitDirectory = _gitUtil.CloneToTempDirectory($"https://github.com/soenneker/{Constants.Library.ToLowerInvariant()}");
+        string tempDir = _directoryUtil.CreateTempDirectory();
 
-        string targetExePath = Path.Combine(gitDirectory, "src", "Resources", Constants.FileName);
+        string linesPath = Path.Combine(tempDir, "zipcodes.txt");
 
-        bool needToUpdate = await CheckForHashDifferences(gitDirectory, filePath);
+        await _fileUtil.WriteAllLines(linesPath, hashSet);
+
+        string gitTempDirectory = _gitUtil.CloneToTempDirectory($"https://github.com/soenneker/{Constants.Library.ToLowerInvariant()}");
+        
+        string targetExePath = Path.Combine(gitTempDirectory, "src", "Resources", Constants.FileName);
+
+        bool needToUpdate = await CheckForHashDifferences(gitTempDirectory, linesPath);
 
         if (!needToUpdate)
             return;
 
-        await BuildPackAndPush(gitDirectory, targetExePath, filePath);
+        await BuildPackAndPush(gitTempDirectory, targetExePath, linesPath);
 
-        await SaveHashToGitRepo(gitDirectory);
+        await SaveToGitRepo(gitTempDirectory);
+
+        _fileUtilSync.Delete(linesPath);
+        _directoryUtil.Delete(gitTempDirectory);
     }
 
-    private async ValueTask BuildPackAndPush(string gitDirectory, string targetExePath, string filePath)
+    private async ValueTask BuildPackAndPush(string gitDirectory, string targetFilePath, string filePath)
     {
-        _fileUtilSync.DeleteIfExists(targetExePath);
+        _fileUtilSync.DeleteIfExists(targetFilePath);
 
         _directoryUtil.CreateIfDoesNotExist(Path.Combine(gitDirectory, "src", "Resources"));
 
-        _fileUtilSync.Move(filePath, targetExePath);
+        _fileUtilSync.Move(filePath, targetFilePath);
 
         string projFilePath = Path.Combine(gitDirectory, "src", $"{Constants.Library}.csproj");
 
@@ -110,15 +120,13 @@ public class FileOperationsUtil : IFileOperationsUtil
         return true;
     }
 
-    private async ValueTask SaveHashToGitRepo(string gitDirectory)
+    private async ValueTask SaveToGitRepo(string gitDirectory)
     {
         string targetHashFile = Path.Combine(gitDirectory, "hash.txt");
 
         _fileUtilSync.DeleteIfExists(targetHashFile);
 
         await _fileUtil.WriteFile(targetHashFile, _newHash!);
-
-        _fileUtilSync.DeleteIfExists(Path.Combine(gitDirectory, "src", "Resources", Constants.FileName));
 
         _gitUtil.AddIfNotExists(gitDirectory, targetHashFile);
 

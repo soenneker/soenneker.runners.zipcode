@@ -4,9 +4,9 @@ using System.Data;
 using System.IO;
 using ExcelDataReader;
 using Microsoft.Extensions.Logging;
-using Soenneker.Data.ZipCode.Utils.Abstract;
+using Soenneker.Runners.ZipCode.Utils.Abstract;
 
-namespace Soenneker.Data.ZipCode.Utils;
+namespace Soenneker.Runners.ZipCode.Utils;
 
 ///<inheritdoc cref="IExcelFileReaderUtil"/>
 public class ExcelFileReaderUtil : IExcelFileReaderUtil
@@ -19,9 +19,11 @@ public class ExcelFileReaderUtil : IExcelFileReaderUtil
 
         System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
     }
-
+    
     public HashSet<string> GetZipCodesFromXls(string path)
     {
+        _logger.LogInformation("Retrieving unique Zip codes from XLS...");
+
         var result = new HashSet<string>();
 
         using (FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read))
@@ -57,6 +59,8 @@ public class ExcelFileReaderUtil : IExcelFileReaderUtil
 
                         result.Add(deliveryZip!);
                     }
+
+                    _logger.LogDebug("Completed parsing Zip codes");
 
                     return result;
                 }

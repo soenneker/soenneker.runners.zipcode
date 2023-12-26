@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Soenneker.Data.ZipCode.Utils.Abstract;
+namespace Soenneker.Runners.ZipCode.Utils.Abstract;
 
 public interface IExcelFileReaderUtil
 {
