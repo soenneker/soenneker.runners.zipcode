@@ -10,7 +10,7 @@
 
     <PropertyGroup>
         <Description>Automatically updates the Soenneker.Data.ZipCode package</Description>
-        <Version Condition="'$(BUILD_VERSION)' == ''">2.1.0</Version>
+        <Version Condition="'$(BUILD_VERSION)' == ''">2.2.0</Version>
         <Version Condition="'$(BUILD_VERSION)' != ''">$(BUILD_VERSION)</Version>
         <AssemblyName>Soenneker.Runners.ZipCode</AssemblyName>
         <PackageId>Soenneker.Runners.ZipCode</PackageId>
