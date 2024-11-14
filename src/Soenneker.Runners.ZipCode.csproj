@@ -44,7 +44,7 @@
         <PackageReference Include="ExcelDataReader" Version="3.7.0" />
         <PackageReference Include="ExcelDataReader.DataSet" Version="3.7.0" />
         <PackageReference Include="HtmlAgilityPack" Version="1.11.68" />
-        <PackageReference Include="Soenneker.Extensions.LoggerConfiguration" Version="3.0.601" />
+        <PackageReference Include="Soenneker.Extensions.LoggerConfiguration" Version="3.0.604" />
         <PackageReference Include="Soenneker.Git.Util" Version="2.1.1800" />
         <PackageReference Include="Soenneker.Utils.Dotnet" Version="3.0.1309" />
         <PackageReference Include="Soenneker.Utils.Dotnet.NuGet" Version="2.1.1110" />
