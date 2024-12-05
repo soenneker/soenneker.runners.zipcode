@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Soenneker.Extensions.String;
 using Soenneker.Git.Util.Abstract;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
 using Soenneker.Utils.Directory.Abstract;
@@ -49,7 +50,7 @@ public class FileOperationsUtil : IFileOperationsUtil
 
         await _fileUtil.WriteAllLines(linesPath, hashSet);
 
-        string gitTempDirectory = _gitUtil.CloneToTempDirectory($"https://github.com/soenneker/{Constants.Library.ToLowerInvariant()}");
+        string gitTempDirectory = _gitUtil.CloneToTempDirectory($"https://github.com/soenneker/{Constants.Library.ToLowerInvariantFast()}");
         
         string targetExePath = Path.Combine(gitTempDirectory, "src", "Resources", Constants.FileName);
 
