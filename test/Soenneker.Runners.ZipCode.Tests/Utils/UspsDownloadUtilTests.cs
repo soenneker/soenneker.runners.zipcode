@@ -1,10 +1,10 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Soenneker.Facts.Local;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
 using Soenneker.Tests.FixturedUnit;
 using Xunit;
-using Xunit.Abstractions;
+
 
 namespace Soenneker.Runners.ZipCode.Tests.Utils;
 

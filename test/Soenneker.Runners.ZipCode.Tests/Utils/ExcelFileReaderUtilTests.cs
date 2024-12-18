@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using FluentAssertions;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
 using Soenneker.Tests.FixturedUnit;
 using Xunit;
-using Xunit.Abstractions;
+
 
 namespace Soenneker.Runners.ZipCode.Tests.Utils;
 
