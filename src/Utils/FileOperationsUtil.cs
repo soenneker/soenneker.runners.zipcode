@@ -1,5 +1,6 @@
-using System.Collections.Generic;
+using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Soenneker.Extensions.String;
@@ -42,65 +43,53 @@ public class FileOperationsUtil : IFileOperationsUtil
         _sha3Util = sha3Util;
     }
 
-    public async ValueTask Process(HashSet<string> hashSet)
+    public async ValueTask Process(string filePath, CancellationToken cancellationToken)
     {
-        string tempDir = _directoryUtil.CreateTempDirectory();
+        string gitDirectory = _gitUtil.CloneToTempDirectory($"https://github.com/soenneker/{Constants.Library.ToLowerInvariantFast()}");
 
-        string linesPath = Path.Combine(tempDir, "zipcodes.txt");
+        string targetExePath = Path.Combine(gitDirectory, "src", "Resources", Constants.FileName);
 
-        await _fileUtil.WriteAllLines(linesPath, hashSet);
-
-        string gitTempDirectory = _gitUtil.CloneToTempDirectory($"https://github.com/soenneker/{Constants.Library.ToLowerInvariantFast()}");
-        
-        string targetExePath = Path.Combine(gitTempDirectory, "src", "Resources", Constants.FileName);
-
-        bool needToUpdate = await CheckForHashDifferences(gitTempDirectory, linesPath);
+        bool needToUpdate = await CheckForHashDifferences(gitDirectory, filePath, cancellationToken);
 
         if (!needToUpdate)
             return;
 
-        await BuildPackAndPush(gitTempDirectory, targetExePath, linesPath);
+        await BuildPackAndPush(gitDirectory, targetExePath, filePath, cancellationToken);
 
-        await SaveToGitRepo(gitTempDirectory);
-
-        _fileUtilSync.Delete(linesPath);
-        _directoryUtil.Delete(gitTempDirectory);
+        await SaveHashToGitRepo(gitDirectory, cancellationToken);
     }
 
-    private async ValueTask BuildPackAndPush(string gitDirectory, string targetFilePath, string filePath)
+    private async ValueTask BuildPackAndPush(string gitDirectory, string targetExePath, string filePath, CancellationToken cancellationToken)
     {
-        _fileUtilSync.DeleteIfExists(targetFilePath);
+        _fileUtilSync.DeleteIfExists(targetExePath);
 
         _directoryUtil.CreateIfDoesNotExist(Path.Combine(gitDirectory, "src", "Resources"));
 
-        _fileUtilSync.Move(filePath, targetFilePath);
+        _fileUtilSync.Move(filePath, targetExePath);
 
         string projFilePath = Path.Combine(gitDirectory, "src", $"{Constants.Library}.csproj");
 
-        await _dotnetUtil.Restore(projFilePath);
+        await _dotnetUtil.Restore(projFilePath, cancellationToken: cancellationToken);
 
-        bool successful = await _dotnetUtil.Build(projFilePath, true, "Release", false);
+        bool successful = await _dotnetUtil.Build(projFilePath, true, "Release", false, cancellationToken: cancellationToken);
 
         if (!successful)
-        {
-            _logger.LogError("Build was not successful, exiting...");
-            return;
-        }
+            throw new Exception("Build was not successful, exiting...");
 
         string version = EnvironmentUtil.GetVariableStrict("BUILD_VERSION");
 
-        await _dotnetUtil.Pack(projFilePath, version, true, "Release", false, false, gitDirectory);
+        await _dotnetUtil.Pack(projFilePath, version, true, "Release", false, false, gitDirectory, cancellationToken: cancellationToken);
 
-        string apiKey = EnvironmentUtil.GetVariableStrict("NUGET_TOKEN");
+        string apiKey = EnvironmentUtil.GetVariableStrict("NUGET_API_KEY");
 
         string nuGetPackagePath = Path.Combine(gitDirectory, $"{Constants.Library}.{version}.nupkg");
 
-        await _dotnetNuGetUtil.Push(nuGetPackagePath, apiKey);
+        await _dotnetNuGetUtil.Push(nuGetPackagePath, apiKey: apiKey, cancellationToken: cancellationToken);
     }
 
-    private async ValueTask<bool> CheckForHashDifferences(string gitDirectory, string filePath)
+    private async ValueTask<bool> CheckForHashDifferences(string gitDirectory, string filePath, CancellationToken cancellationToken)
     {
-        string? oldHash = await _fileUtil.TryReadFile(Path.Combine(gitDirectory, "hash.txt"));
+        string? oldHash = await _fileUtil.TryReadFile(Path.Combine(gitDirectory, "hash.txt"), true, cancellationToken);
 
         if (oldHash == null)
         {
@@ -108,9 +97,7 @@ public class FileOperationsUtil : IFileOperationsUtil
             return true;
         }
 
-        _newHash = await _sha3Util.HashFile(filePath);
-
-        _logger.LogDebug("New hash: {newHash}, old hash: {oldHash}", _newHash, oldHash);
+        _newHash = await _sha3Util.HashFile(filePath, true, cancellationToken);
 
         if (oldHash == _newHash)
         {
@@ -121,13 +108,15 @@ public class FileOperationsUtil : IFileOperationsUtil
         return true;
     }
 
-    private async ValueTask SaveToGitRepo(string gitDirectory)
+    private async ValueTask SaveHashToGitRepo(string gitDirectory, CancellationToken cancellationToken)
     {
         string targetHashFile = Path.Combine(gitDirectory, "hash.txt");
 
         _fileUtilSync.DeleteIfExists(targetHashFile);
 
-        await _fileUtil.WriteFile(targetHashFile, _newHash!);
+        await _fileUtil.WriteFile(targetHashFile, _newHash!, cancellationToken);
+
+        _fileUtilSync.DeleteIfExists(Path.Combine(gitDirectory, "src", "Resources", Constants.FileName));
 
         _gitUtil.AddIfNotExists(gitDirectory, targetHashFile);
 
@@ -135,10 +124,10 @@ public class FileOperationsUtil : IFileOperationsUtil
         {
             _logger.LogInformation("Changes have been detected in the repository, commiting and pushing...");
 
-            string name = EnvironmentUtil.GetVariableStrict("NAME");
-            string email = EnvironmentUtil.GetVariableStrict("EMAIL");
-            string username = EnvironmentUtil.GetVariableStrict("USERNAME");
-            string token = EnvironmentUtil.GetVariableStrict("TOKEN");
+            string name = EnvironmentUtil.GetVariableStrict("Name");
+            string email = EnvironmentUtil.GetVariableStrict("Email");
+            string username = EnvironmentUtil.GetVariableStrict("Username");
+            string token = EnvironmentUtil.GetVariableStrict("Token");
 
             _gitUtil.Commit(gitDirectory, "Updates hash for new version", name, email);
 

@@ -4,7 +4,7 @@ using Soenneker.Runners.ZipCode.Utils;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
 using Soenneker.Utils.Dotnet.NuGet.Registrars;
 using Soenneker.Utils.Dotnet.Registrars;
-using Soenneker.Utils.File.Registrars;
+using Soenneker.Utils.File.Download.Registrars;
 using Soenneker.Utils.FileSync.Registrars;
 using Soenneker.Utils.HttpClientCache.Registrar;
 using Soenneker.Utils.SHA3.Registrars;
@@ -22,11 +22,10 @@ public class Startup
         SetupIoC(services);
     }
 
-    public static void SetupIoC(IServiceCollection services)
+    public static IServiceCollection SetupIoC(IServiceCollection services)
     {
         services.AddHttpClientCache();
         services.AddHostedService<ConsoleHostedService>();
-        services.AddFileUtilAsScoped();
         services.AddFileUtilSyncAsScoped();
         services.AddGitUtilAsScoped();
         services.AddSha3UtilAsScoped();
@@ -35,5 +34,8 @@ public class Startup
         services.AddScoped<IFileOperationsUtil, FileOperationsUtil>();
         services.AddDotnetNuGetUtilAsScoped();
         services.AddDotnetUtilAsScoped();
+        services.AddFileDownloadUtilAsScoped();
+
+        return services;
     }
 }

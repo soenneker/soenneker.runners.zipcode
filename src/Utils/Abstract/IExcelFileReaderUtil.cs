@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Soenneker.Runners.ZipCode.Utils.Abstract;
 
 public interface IExcelFileReaderUtil
 {
-    HashSet<string> GetZipCodesFromXls(string path);
+    ValueTask<string> CreateZipCodesFromXls(string path, CancellationToken cancellationToken = default);
 }

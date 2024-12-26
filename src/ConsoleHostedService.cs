@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,8 +19,8 @@ public class ConsoleHostedService : IHostedService
 
     private int? _exitCode;
 
-    public ConsoleHostedService(ILogger<ConsoleHostedService> logger, IHostApplicationLifetime appLifetime, 
-        IFileOperationsUtil fileOperationsUtil,IExcelFileReaderUtil excelFileReaderUtil, IUspsDownloadUtil uspsDownloadUtil)
+    public ConsoleHostedService(ILogger<ConsoleHostedService> logger, IHostApplicationLifetime appLifetime,
+        IFileOperationsUtil fileOperationsUtil, IExcelFileReaderUtil excelFileReaderUtil, IUspsDownloadUtil uspsDownloadUtil)
     {
         _logger = logger;
         _appLifetime = appLifetime;
@@ -40,10 +39,10 @@ public class ConsoleHostedService : IHostedService
 
                 try
                 {
-                    string fileName = await _uspsDownloadUtil.Download();
-                    HashSet<string> hashSet = _excelFileReaderUtil.GetZipCodesFromXls(fileName);
+                    string fileName = await _uspsDownloadUtil.Download(cancellationToken);
+                    string filePath = await _excelFileReaderUtil.CreateZipCodesFromXls(fileName, cancellationToken);
 
-                    await _fileOperationsUtil.Process(hashSet);
+                    await _fileOperationsUtil.Process(filePath, cancellationToken);
 
                     _logger.LogInformation("Complete!");
 
@@ -56,7 +55,7 @@ public class ConsoleHostedService : IHostedService
 
                     _logger.LogError(e, "Unhandled exception");
 
-                    await Task.Delay(2000);
+                    await Task.Delay(2000, cancellationToken);
                     _exitCode = 1;
                 }
                 finally

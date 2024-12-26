@@ -1,12 +1,12 @@
 ﻿using System;
-using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
-using Soenneker.Utils.FileSync;
 using Soenneker.Utils.HttpClientCache.Abstract;
 using HtmlAgilityPack;
+using Soenneker.Utils.File.Download.Abstract;
+using System.Threading;
 
 namespace Soenneker.Runners.ZipCode.Utils;
 
@@ -15,35 +15,22 @@ public class UspsDownloadUtil : IUspsDownloadUtil
 {
     private readonly ILogger<UspsDownloadUtil> _logger;
     private readonly IHttpClientCache _httpClientCache;
+    private readonly IFileDownloadUtil _fileDownloadUtil;
 
-    public UspsDownloadUtil(IHttpClientCache httpClientCache,  ILogger<UspsDownloadUtil> logger)
+    public UspsDownloadUtil(IHttpClientCache httpClientCache,  ILogger<UspsDownloadUtil> logger, IFileDownloadUtil fileDownloadUtil)
     {
         _httpClientCache = httpClientCache;
         _logger = logger;
+        _fileDownloadUtil = fileDownloadUtil;
     }
 
-    public async ValueTask<string> Download()
+    public async ValueTask<string> Download(CancellationToken cancellationToken = default)
     {
         string directory = await GetDirectory();
 
         var uri = $"https://postalpro.usps.com/mnt/glusterfs/{directory}/ZIP_Locale_Detail.xls";
 
-        _logger.LogInformation("Downloading file from uri ({uri}) ...", uri);
-
-        HttpClient client = await _httpClientCache.Get(nameof(UspsDownloadUtil));
-
-        HttpResponseMessage response = await client.GetAsync(uri);
-
-        string tempFile = FileUtilSync.GetTempFileName() + ".xls";
-
-        await using (var fs = new FileStream(tempFile, FileMode.CreateNew))
-        {
-            await response.Content.CopyToAsync(fs);
-        }
-
-        _logger.LogDebug("Finished downloading file from uri ({uri})", uri);
-
-        return tempFile;
+        return await _fileDownloadUtil.Download(uri, fileExtension: "xls", cancellationToken: cancellationToken);
     }
 
     public async ValueTask<DateTime?> GetLastUpdatedDateTime()

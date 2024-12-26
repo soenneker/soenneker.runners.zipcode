@@ -1,10 +1,9 @@
-using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
 using Soenneker.Tests.FixturedUnit;
 using Xunit;
-
 
 namespace Soenneker.Runners.ZipCode.Tests.Utils;
 
@@ -19,9 +18,9 @@ public class ExcelFileReaderUtilTests : FixturedUnitTest
     }
 
     [Fact]
-    public void GetZipCodesFromXls_should_parse()
+    public async ValueTask GetZipCodesFromXls_should_parse()
     {
-       HashSet<string> result = _util.GetZipCodesFromXls(Path.Combine("Resources", "ZIP_Locale_Detail.xls"));
-       result.Should().NotBeNullOrEmpty();
+        string result = await _util.CreateZipCodesFromXls(Path.Combine("Resources", "ZIP_Locale_Detail.xls"));
+        result.Should().NotBeNull();
     }
 }

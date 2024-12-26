@@ -5,7 +5,6 @@ using Soenneker.Runners.ZipCode.Utils.Abstract;
 using Soenneker.Tests.FixturedUnit;
 using Xunit;
 
-
 namespace Soenneker.Runners.ZipCode.Tests.Utils;
 
 [Collection("Collection")]

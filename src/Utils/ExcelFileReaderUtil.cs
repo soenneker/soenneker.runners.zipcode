@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using ExcelDataReader;
 using Microsoft.Extensions.Logging;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
+using Soenneker.Utils.File.Abstract;
+using Soenneker.Utils.Path.Abstract;
 
 namespace Soenneker.Runners.ZipCode.Utils;
 
@@ -12,15 +16,19 @@ namespace Soenneker.Runners.ZipCode.Utils;
 public class ExcelFileReaderUtil : IExcelFileReaderUtil
 {
     private readonly ILogger<ExcelFileReaderUtil> _logger;
+    private readonly IFileUtil _fileUtil;
+    private readonly IPathUtil _pathUtil;
 
-    public ExcelFileReaderUtil(ILogger<ExcelFileReaderUtil> logger)
+    public ExcelFileReaderUtil(ILogger<ExcelFileReaderUtil> logger, IFileUtil fileUtil, IPathUtil pathUtil)
     {
         _logger = logger;
+        _fileUtil = fileUtil;
+        _pathUtil = pathUtil;
 
         System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
     }
     
-    public HashSet<string> GetZipCodesFromXls(string path)
+    public async ValueTask<string> CreateZipCodesFromXls(string path, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Retrieving unique Zip codes from XLS...");
 
@@ -62,7 +70,11 @@ public class ExcelFileReaderUtil : IExcelFileReaderUtil
 
                     _logger.LogDebug("Completed parsing Zip codes");
 
-                    return result;
+                    string linesPath = await _pathUtil.GetThreadSafeTempUniqueFilePath("txt", cancellationToken);
+
+                    await _fileUtil.WriteAllLines(linesPath, result, cancellationToken);
+
+                    return linesPath;
                 }
 
                 throw new Exception("Unable to parse data file, address immediately");
