@@ -124,10 +124,10 @@ public class FileOperationsUtil : IFileOperationsUtil
         {
             _logger.LogInformation("Changes have been detected in the repository, commiting and pushing...");
 
-            string name = EnvironmentUtil.GetVariableStrict("Name");
-            string email = EnvironmentUtil.GetVariableStrict("Email");
-            string username = EnvironmentUtil.GetVariableStrict("Username");
-            string token = EnvironmentUtil.GetVariableStrict("Token");
+            string name = EnvironmentUtil.GetVariableStrict("NAME");
+            string email = EnvironmentUtil.GetVariableStrict("EMAIL");
+            string username = EnvironmentUtil.GetVariableStrict("USERNAME");
+            string token = EnvironmentUtil.GetVariableStrict("TOKEN");
 
             _gitUtil.Commit(gitDirectory, "Updates hash for new version", name, email);
 
