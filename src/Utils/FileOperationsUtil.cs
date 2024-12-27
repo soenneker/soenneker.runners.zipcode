@@ -80,7 +80,7 @@ public class FileOperationsUtil : IFileOperationsUtil
 
         await _dotnetUtil.Pack(projFilePath, version, true, "Release", false, false, gitDirectory, cancellationToken: cancellationToken);
 
-        string apiKey = EnvironmentUtil.GetVariableStrict("NUGET_API_KEY");
+        string apiKey = EnvironmentUtil.GetVariableStrict("NUGET_TOKEN");
 
         string nuGetPackagePath = Path.Combine(gitDirectory, $"{Constants.Library}.{version}.nupkg");
 
