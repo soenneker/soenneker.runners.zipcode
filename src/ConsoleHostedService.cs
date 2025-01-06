@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Soenneker.Managers.Runners.Abstract;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
 
 namespace Soenneker.Runners.ZipCode;
@@ -13,20 +14,20 @@ public class ConsoleHostedService : IHostedService
     private readonly ILogger<ConsoleHostedService> _logger;
 
     private readonly IHostApplicationLifetime _appLifetime;
-    private readonly IFileOperationsUtil _fileOperationsUtil;
+    private readonly IRunnersManager _runnersManager;
     private readonly IExcelFileReaderUtil _excelFileReaderUtil;
     private readonly IUspsDownloadUtil _uspsDownloadUtil;
 
     private int? _exitCode;
 
     public ConsoleHostedService(ILogger<ConsoleHostedService> logger, IHostApplicationLifetime appLifetime,
-        IFileOperationsUtil fileOperationsUtil, IExcelFileReaderUtil excelFileReaderUtil, IUspsDownloadUtil uspsDownloadUtil)
+        IExcelFileReaderUtil excelFileReaderUtil, IUspsDownloadUtil uspsDownloadUtil, IRunnersManager runnersManager)
     {
         _logger = logger;
         _appLifetime = appLifetime;
-        _fileOperationsUtil = fileOperationsUtil;
         _excelFileReaderUtil = excelFileReaderUtil;
         _uspsDownloadUtil = uspsDownloadUtil;
+        _runnersManager = runnersManager;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -42,7 +43,7 @@ public class ConsoleHostedService : IHostedService
                     string fileName = await _uspsDownloadUtil.Download(cancellationToken);
                     string filePath = await _excelFileReaderUtil.CreateZipCodesFromXls(fileName, cancellationToken);
 
-                    await _fileOperationsUtil.Process(filePath, cancellationToken);
+                    await _runnersManager.PushIfChangesNeeded(filePath, Constants.FileName, Constants.Library, $"https://github.com/soenneker/{Constants.Library}", cancellationToken);
 
                     _logger.LogInformation("Complete!");
 

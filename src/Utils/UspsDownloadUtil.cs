@@ -30,7 +30,7 @@ public class UspsDownloadUtil : IUspsDownloadUtil
 
         var uri = $"https://postalpro.usps.com/mnt/glusterfs/{directory}/ZIP_Locale_Detail.xls";
 
-        return await _fileDownloadUtil.Download(uri, fileExtension: "xls", cancellationToken: cancellationToken);
+        return (await _fileDownloadUtil.Download(uri, fileExtension: "xls", cancellationToken: cancellationToken))!;
     }
 
     public async ValueTask<DateTime?> GetLastUpdatedDateTime()
