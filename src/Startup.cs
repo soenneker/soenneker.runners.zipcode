@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Soenneker.Managers.Runners.Registrars;
 using Soenneker.Runners.ZipCode.Utils;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
 using Soenneker.Utils.File.Download.Registrars;
@@ -22,6 +23,7 @@ public class Startup
         services.AddScoped<IExcelFileReaderUtil, ExcelFileReaderUtil>();
         services.AddScoped<IUspsDownloadUtil, UspsDownloadUtil>();
         services.AddFileDownloadUtilAsScoped();
+        services.AddRunnersManagerAsScoped();
 
         return services;
     }
