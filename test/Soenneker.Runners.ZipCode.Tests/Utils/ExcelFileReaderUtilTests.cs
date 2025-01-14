@@ -20,7 +20,7 @@ public class ExcelFileReaderUtilTests : FixturedUnitTest
     [Fact]
     public async ValueTask GetZipCodesFromXls_should_parse()
     {
-        string result = await _util.CreateZipCodesFromXls(Path.Combine("Resources", "ZIP_Locale_Detail.xls"));
+        string result = await _util.CreateZipCodesFromXls(Path.Combine("Resources", "ZIP_Locale_Detail.xls"), CancellationToken);
         result.Should().NotBeNull();
     }
 }
