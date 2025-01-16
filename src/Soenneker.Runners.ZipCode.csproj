@@ -45,7 +45,7 @@
         <PackageReference Include="HtmlAgilityPack" Version="1.11.72" />
         <PackageReference Include="Soenneker.Extensions.LoggerConfiguration" Version="3.0.793" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.1" />
-        <PackageReference Include="Soenneker.Managers.Runners" Version="3.0.112" />
+        <PackageReference Include="Soenneker.Managers.Runners" Version="3.0.115" />
         <PackageReference Include="Soenneker.Utils.File.Download" Version="3.0.561" />
     </ItemGroup>
 </Project>
