@@ -10,7 +10,7 @@ public interface IUspsDownloadUtil
 
     DateTime? GetDateFromHtml(string html);
 
-    ValueTask<DateTime?> GetLastUpdatedDateTime();
+    ValueTask<DateTime?> GetLastUpdatedDateTime(CancellationToken cancellationToken = default);
 
-    ValueTask<string> GetDirectory();
+    ValueTask<string> GetDirectory(CancellationToken cancellationToken = default);
 }

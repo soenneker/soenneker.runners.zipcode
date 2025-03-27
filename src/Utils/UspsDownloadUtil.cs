@@ -1,12 +1,14 @@
-﻿using System;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
+using Soenneker.Extensions.Task;
+using Soenneker.Extensions.ValueTask;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
-using Soenneker.Utils.HttpClientCache.Abstract;
-using HtmlAgilityPack;
 using Soenneker.Utils.File.Download.Abstract;
+using Soenneker.Utils.HttpClientCache.Abstract;
+using System;
+using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Soenneker.Runners.ZipCode.Utils;
 
@@ -26,20 +28,20 @@ public class UspsDownloadUtil : IUspsDownloadUtil
 
     public async ValueTask<string> Download(CancellationToken cancellationToken = default)
     {
-        string directory = await GetDirectory();
+        string directory = await GetDirectory(cancellationToken);
 
         var uri = $"https://postalpro.usps.com/mnt/glusterfs/{directory}/ZIP_Locale_Detail.xls";
 
         return (await _fileDownloadUtil.Download(uri, fileExtension: "xls", cancellationToken: cancellationToken))!;
     }
 
-    public async ValueTask<DateTime?> GetLastUpdatedDateTime()
+    public async ValueTask<DateTime?> GetLastUpdatedDateTime(CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Downloading https://postalpro.usps.com/ZIP_Locale_Detail to get the HTML so we can find the last updated date...");
 
-        HttpClient client = await _httpClientCache.Get(nameof(UspsDownloadUtil));
-        HttpResponseMessage message = await client.GetAsync("https://postalpro.usps.com/ZIP_Locale_Detail");
-        string html = await message.Content.ReadAsStringAsync();
+        HttpClient client = await _httpClientCache.Get(nameof(UspsDownloadUtil), cancellationToken: cancellationToken).NoSync();
+        HttpResponseMessage message = await client.GetAsync("https://postalpro.usps.com/ZIP_Locale_Detail", cancellationToken).NoSync();
+        string html = await message.Content.ReadAsStringAsync(cancellationToken).NoSync();
 
         DateTime? dateTime = GetDateFromHtml(html);
 
@@ -68,11 +70,11 @@ public class UspsDownloadUtil : IUspsDownloadUtil
         return null;
     }
 
-    public async ValueTask<string> GetDirectory()
+    public async ValueTask<string> GetDirectory(CancellationToken cancellationToken = default)
     {
         string result;
 
-        DateTime? retrievedDateTime = await GetLastUpdatedDateTime();
+        DateTime? retrievedDateTime = await GetLastUpdatedDateTime(cancellationToken).NoSync();
 
         if (retrievedDateTime != null)
             result = retrievedDateTime.Value.ToString("yyyy-MM");
