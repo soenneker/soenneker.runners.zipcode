@@ -20,8 +20,8 @@ public class ConsoleHostedService : IHostedService
 
     private int? _exitCode;
 
-    public ConsoleHostedService(ILogger<ConsoleHostedService> logger, IHostApplicationLifetime appLifetime,
-        IExcelFileReaderUtil excelFileReaderUtil, IUspsDownloadUtil uspsDownloadUtil, IRunnersManager runnersManager)
+    public ConsoleHostedService(ILogger<ConsoleHostedService> logger, IHostApplicationLifetime appLifetime, IExcelFileReaderUtil excelFileReaderUtil,
+        IUspsDownloadUtil uspsDownloadUtil, IRunnersManager runnersManager)
     {
         _logger = logger;
         _appLifetime = appLifetime;
@@ -43,7 +43,8 @@ public class ConsoleHostedService : IHostedService
                     string fileName = await _uspsDownloadUtil.Download(cancellationToken);
                     string filePath = await _excelFileReaderUtil.CreateZipCodesFromXls(fileName, cancellationToken);
 
-                    await _runnersManager.PushIfChangesNeeded(filePath, Constants.FileName, Constants.Library, $"https://github.com/soenneker/{Constants.Library}", cancellationToken);
+                    await _runnersManager.PushIfChangesNeeded(filePath, Constants.FileName, Constants.Library,
+                        $"https://github.com/soenneker/{Constants.Library}", cancellationToken);
 
                     _logger.LogInformation("Complete!");
 

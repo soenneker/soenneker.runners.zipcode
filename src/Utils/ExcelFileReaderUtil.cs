@@ -70,7 +70,7 @@ public class ExcelFileReaderUtil : IExcelFileReaderUtil
 
                     _logger.LogDebug("Completed parsing Zip codes");
 
-                    string linesPath = await _pathUtil.GetThreadSafeTempUniqueFilePath("txt", cancellationToken);
+                    string linesPath = await _pathUtil.GetRandomTempFilePath("txt", cancellationToken);
 
                     await _fileUtil.WriteAllLines(linesPath, result, cancellationToken);
 

@@ -19,11 +19,11 @@ public class Startup
 
     public static IServiceCollection SetupIoC(IServiceCollection services)
     {
-        services.AddHostedService<ConsoleHostedService>();
-        services.AddScoped<IExcelFileReaderUtil, ExcelFileReaderUtil>();
-        services.AddScoped<IUspsDownloadUtil, UspsDownloadUtil>();
-        services.AddFileDownloadUtilAsScoped();
-        services.AddRunnersManagerAsScoped();
+        services.AddHostedService<ConsoleHostedService>()
+                .AddScoped<IExcelFileReaderUtil, ExcelFileReaderUtil>()
+                .AddScoped<IUspsDownloadUtil, UspsDownloadUtil>()
+                .AddFileDownloadUtilAsScoped()
+                .AddRunnersManagerAsScoped();
 
         return services;
     }
