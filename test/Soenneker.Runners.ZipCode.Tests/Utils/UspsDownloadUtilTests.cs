@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 using Soenneker.Facts.Local;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
 using Soenneker.Tests.FixturedUnit;

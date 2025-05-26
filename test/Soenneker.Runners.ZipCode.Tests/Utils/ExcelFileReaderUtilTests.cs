@@ -1,6 +1,6 @@
 using System.IO;
 using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
 using Soenneker.Tests.FixturedUnit;
 using Xunit;
