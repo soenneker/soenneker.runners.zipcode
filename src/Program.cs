@@ -6,9 +6,8 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Soenneker.Enums.DeployEnvironment;
 using Soenneker.Extensions.LoggerConfiguration;
-using Soenneker.Runners.ZipCode;
 
-namespace Soenneker.Runners.FFmpeg;
+namespace Soenneker.Runners.ZipCode;
 
 public class Program
 {
@@ -57,6 +56,7 @@ public class Program
         IHostBuilder host = Host.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((hostingContext, builder) =>
             {
+                builder.AddEnvironmentVariables();
                 builder.SetBasePath(hostingContext.HostingEnvironment.ContentRootPath);
 
                 builder.Build();
