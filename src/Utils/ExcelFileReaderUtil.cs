@@ -72,7 +72,7 @@ public class ExcelFileReaderUtil : IExcelFileReaderUtil
 
                     string linesPath = await _pathUtil.GetRandomTempFilePath("txt", cancellationToken);
 
-                    await _fileUtil.WriteAllLines(linesPath, result, cancellationToken);
+                    await _fileUtil.WriteAllLines(linesPath, result, true, cancellationToken);
 
                     return linesPath;
                 }
