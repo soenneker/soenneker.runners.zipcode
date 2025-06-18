@@ -13,7 +13,7 @@ using Soenneker.Utils.Path.Abstract;
 namespace Soenneker.Runners.ZipCode.Utils;
 
 ///<inheritdoc cref="IExcelFileReaderUtil"/>
-public class ExcelFileReaderUtil : IExcelFileReaderUtil
+public sealed class ExcelFileReaderUtil : IExcelFileReaderUtil
 {
     private readonly ILogger<ExcelFileReaderUtil> _logger;
     private readonly IFileUtil _fileUtil;
@@ -34,7 +34,7 @@ public class ExcelFileReaderUtil : IExcelFileReaderUtil
 
         var result = new HashSet<string>();
 
-        using (FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read))
+        await using (FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read))
         {
             // Use ExcelDataReader to read the XLS file
             using (IExcelDataReader? reader = ExcelReaderFactory.CreateReader(stream))
