@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Soenneker.Runners.ZipCode.Utils;
 
 ///<inheritdoc cref="IUspsDownloadUtil"/>
-public class UspsDownloadUtil : IUspsDownloadUtil
+public sealed class UspsDownloadUtil : IUspsDownloadUtil
 {
     private readonly ILogger<UspsDownloadUtil> _logger;
     private readonly IHttpClientCache _httpClientCache;
