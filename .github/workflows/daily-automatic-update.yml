@@ -16,9 +16,12 @@ jobs:
 
   daily-automatic-update:
     runs-on: ubuntu-latest
-  
+ 
     steps:
       - uses: actions/checkout@v4
+  
+      - name: Debug env
+        run: echo "GH__USERNAME=${GH__USERNAME}"
 
       - name: Setting up build version
         run: |
@@ -55,4 +58,4 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Run
-        run: dotnet run --project src/Soenneker.Runners.ZipCode.csproj --no-restore --verbosity normal --framework net9.0
+        run: dotnet run --project src/Soenneker.Runners.ZipCode.csproj --no-restore --verbosity normal --framework net9.0 -c Release
