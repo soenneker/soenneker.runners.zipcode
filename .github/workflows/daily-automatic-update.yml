@@ -19,9 +19,6 @@ jobs:
  
     steps:
       - uses: actions/checkout@v4
-  
-      - name: Debug env
-        run: echo "GH__USERNAME=${GH__USERNAME}"
 
       - name: Setting up build version
         run: |
