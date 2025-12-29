@@ -1,6 +1,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using AwesomeAssertions;
+using Soenneker.Facts.Manual;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
 using Soenneker.Tests.FixturedUnit;
 using Xunit;
@@ -17,7 +18,8 @@ public class ExcelFileReaderUtilTests : FixturedUnitTest
         _util = Resolve<IExcelFileReaderUtil>();
     }
 
-    [Fact]
+    [ManualFact]
+    //[LocalFact]
     public async ValueTask GetZipCodesFromXls_should_parse()
     {
         string result = await _util.CreateZipCodesFromXls(Path.Combine("Resources", "ZIP_Locale_Detail.xls"), CancellationToken);

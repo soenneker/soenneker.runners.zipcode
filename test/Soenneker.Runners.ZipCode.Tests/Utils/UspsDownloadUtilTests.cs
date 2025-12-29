@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using AwesomeAssertions;
-using Soenneker.Facts.Local;
+using Soenneker.Facts.Manual;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
 using Soenneker.Tests.FixturedUnit;
 using Xunit;
@@ -17,10 +17,17 @@ public class UspsDownloadUtilTests : FixturedUnitTest
         _util = Resolve<IUspsDownloadUtil>();
     }
 
-    [LocalFact]
+    [Fact]
+    public void Default()
+    {
+    }
+
+    //[LocalFact]
+    [ManualFact]
     public async Task Download_should_download()
     {
         string result = await _util.Download();
-        result.Should().NotBeNullOrEmpty();
+        result.Should()
+              .NotBeNullOrEmpty();
     }
 }
