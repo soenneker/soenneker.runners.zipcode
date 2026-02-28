@@ -44,7 +44,7 @@ public class ConsoleHostedService : IHostedService
                     string filePath = await _excelFileReaderUtil.CreateZipCodesFromXls(fileName, cancellationToken);
 
                     await _runnersManager.PushIfChangesNeeded(filePath, Constants.FileName, Constants.Library,
-                        $"https://github.com/soenneker/{Constants.Library}", cancellationToken);
+                        $"https://github.com/soenneker/{Constants.Library}", false, cancellationToken);
 
                     _logger.LogInformation("Complete!");
 
