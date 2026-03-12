@@ -32,7 +32,7 @@
     <PackageReference Include="xUnit.v3" Version="3.2.2" /></ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Soenneker.Runners.ZipCode.csproj" />
+        <ProjectReference Include="..\..\src\Soenneker.Runners.ZipCode\Soenneker.Runners.ZipCode.csproj" />
     </ItemGroup>
 
     <ItemGroup>
