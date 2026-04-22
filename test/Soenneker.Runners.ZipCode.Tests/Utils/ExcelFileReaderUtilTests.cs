@@ -3,23 +3,22 @@ using System.Threading.Tasks;
 using AwesomeAssertions;
 using Soenneker.Facts.Manual;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
-using Soenneker.Tests.FixturedUnit;
-using Xunit;
+using Soenneker.Tests.HostedUnit;
 
 namespace Soenneker.Runners.ZipCode.Tests.Utils;
 
-[Collection("Collection")]
-public class ExcelFileReaderUtilTests : FixturedUnitTest
+[ClassDataSource<Host>(Shared = SharedType.PerTestSession)]
+public class ExcelFileReaderUtilTests : HostedUnitTest
 {
     private readonly IExcelFileReaderUtil _util;
 
-    public ExcelFileReaderUtilTests(Fixture fixture, ITestOutputHelper output) : base(fixture, output)
+    public ExcelFileReaderUtilTests(Host host) : base(host)
     {
         _util = Resolve<IExcelFileReaderUtil>();
     }
 
     [ManualFact]
-    //[LocalFact]
+    //[LocalOnly]
     public async ValueTask GetZipCodesFromXls_should_parse()
     {
         string result = await _util.CreateZipCodesFromXls(Path.Combine("Resources", "ZIP_Locale_Detail.xls"), CancellationToken);

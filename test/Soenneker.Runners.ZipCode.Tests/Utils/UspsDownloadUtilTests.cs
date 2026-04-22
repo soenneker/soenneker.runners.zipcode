@@ -2,27 +2,26 @@ using System.Threading.Tasks;
 using AwesomeAssertions;
 using Soenneker.Facts.Manual;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
-using Soenneker.Tests.FixturedUnit;
-using Xunit;
+using Soenneker.Tests.HostedUnit;
 
 namespace Soenneker.Runners.ZipCode.Tests.Utils;
 
-[Collection("Collection")]
-public class UspsDownloadUtilTests : FixturedUnitTest
+[ClassDataSource<Host>(Shared = SharedType.PerTestSession)]
+public class UspsDownloadUtilTests : HostedUnitTest
 {
     private readonly IUspsDownloadUtil _util;
 
-    public UspsDownloadUtilTests(Fixture fixture, ITestOutputHelper output) : base(fixture, output)
+    public UspsDownloadUtilTests(Host host) : base(host)
     {
         _util = Resolve<IUspsDownloadUtil>();
     }
 
-    [Fact]
+    [Test]
     public void Default()
     {
     }
 
-    //[LocalFact]
+    //[LocalOnly]
     [ManualFact]
     public async Task Download_should_download()
     {
