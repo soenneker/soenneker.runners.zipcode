@@ -1,7 +1,6 @@
 using System.IO;
 using System.Threading.Tasks;
 using AwesomeAssertions;
-using Soenneker.Facts.Manual;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
 using Soenneker.Tests.HostedUnit;
 
@@ -17,7 +16,7 @@ public class ExcelFileReaderUtilTests : HostedUnitTest
         _util = Resolve<IExcelFileReaderUtil>();
     }
 
-    [ManualFact]
+    [Skip("Manual")]
     //[LocalOnly]
     public async ValueTask GetZipCodesFromXls_should_parse()
     {

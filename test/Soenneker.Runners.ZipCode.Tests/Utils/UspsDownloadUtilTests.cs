@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using AwesomeAssertions;
-using Soenneker.Facts.Manual;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
 using Soenneker.Tests.HostedUnit;
 
@@ -22,7 +21,7 @@ public class UspsDownloadUtilTests : HostedUnitTest
     }
 
     //[LocalOnly]
-    [ManualFact]
+    [Skip("Manual")]
     public async Task Download_should_download()
     {
         string result = await _util.Download();
