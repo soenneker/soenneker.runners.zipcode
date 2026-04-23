@@ -20,10 +20,10 @@ public class Startup
     public static IServiceCollection SetupIoC(IServiceCollection services)
     {
         services.AddHostedService<ConsoleHostedService>()
-                .AddScoped<IExcelFileReaderUtil, ExcelFileReaderUtil>()
-                .AddScoped<IUspsDownloadUtil, UspsDownloadUtil>()
-                .AddFileDownloadUtilAsScoped()
-                .AddRunnersManagerAsScoped();
+                .AddSingleton<IExcelFileReaderUtil, ExcelFileReaderUtil>()
+                .AddSingleton<IUspsDownloadUtil, UspsDownloadUtil>()
+                .AddFileDownloadUtilAsSingleton()
+                .AddRunnersManagerAsSingleton();
 
         return services;
     }
