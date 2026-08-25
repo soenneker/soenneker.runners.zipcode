@@ -1,5 +1,7 @@
-﻿using HtmlAgilityPack;
+﻿using AngleSharp.Dom;
+using AngleSharp.Html.Parser;
 using Microsoft.Extensions.Logging;
+using Soenneker.AngleSharp.Parser.Abstract;
 using Soenneker.Extensions.Task;
 using Soenneker.Extensions.ValueTask;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
@@ -18,12 +20,15 @@ public sealed class UspsDownloadUtil : IUspsDownloadUtil
     private readonly ILogger<UspsDownloadUtil> _logger;
     private readonly IHttpClientCache _httpClientCache;
     private readonly IFileDownloadUtil _fileDownloadUtil;
+    private readonly IAngleSharpParser _angleSharpParser;
 
-    public UspsDownloadUtil(IHttpClientCache httpClientCache,  ILogger<UspsDownloadUtil> logger, IFileDownloadUtil fileDownloadUtil)
+    public UspsDownloadUtil(IHttpClientCache httpClientCache, ILogger<UspsDownloadUtil> logger, IFileDownloadUtil fileDownloadUtil,
+        IAngleSharpParser angleSharpParser)
     {
         _httpClientCache = httpClientCache;
         _logger = logger;
         _fileDownloadUtil = fileDownloadUtil;
+        _angleSharpParser = angleSharpParser;
     }
 
     public async ValueTask<string> Download(CancellationToken cancellationToken = default)
@@ -43,24 +48,23 @@ public sealed class UspsDownloadUtil : IUspsDownloadUtil
         HttpResponseMessage message = await client.GetAsync("https://postalpro.usps.com/ZIP_Locale_Detail", cancellationToken).NoSync();
         string html = await message.Content.ReadAsStringAsync(cancellationToken).NoSync();
 
-        DateTime? dateTime = GetDateFromHtml(html);
+        DateTime? dateTime = await GetDateFromHtml(html, cancellationToken).NoSync();
 
         return dateTime;
     }
 
-    public DateTime? GetDateFromHtml(string html)
+    public async ValueTask<DateTime?> GetDateFromHtml(string html, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Getting the last updated date from HTML...");
 
-        var htmlDoc = new HtmlDocument();
+        HtmlParser parser = await _angleSharpParser.Get(cancellationToken).NoSync();
 
         try
         {
-            htmlDoc.LoadHtml(html);
+            using IDocument document = await parser.ParseDocumentAsync(html, cancellationToken).NoSync();
+            IElement? dateElement = document.QuerySelector("div.mb-2");
 
-            HtmlNode myDivNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='mb-2']");
-
-            return Convert.ToDateTime(myDivNode.InnerText);
+            return Convert.ToDateTime(dateElement!.TextContent);
         }
         catch (Exception e)
         {

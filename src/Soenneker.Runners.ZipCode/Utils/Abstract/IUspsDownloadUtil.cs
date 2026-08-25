@@ -20,8 +20,9 @@ public interface IUspsDownloadUtil
     /// Gets date from html.
     /// </summary>
     /// <param name="html">The html.</param>
-    /// <returns>The result of the operation.</returns>
-    DateTime? GetDateFromHtml(string html);
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task containing the result of the operation.</returns>
+    ValueTask<DateTime?> GetDateFromHtml(string html, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets last updated date time.

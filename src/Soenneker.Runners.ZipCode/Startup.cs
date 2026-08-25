@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Soenneker.AngleSharp.Parser.Registrars;
 using Soenneker.Managers.Runners.Registrars;
 using Soenneker.Runners.ZipCode.Utils;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
@@ -31,6 +32,7 @@ public class Startup
         services.AddHostedService<ConsoleHostedService>()
                 .AddSingleton<IExcelFileReaderUtil, ExcelFileReaderUtil>()
                 .AddSingleton<IUspsDownloadUtil, UspsDownloadUtil>()
+                .AddAngleSharpParserAsSingleton()
                 .AddFileDownloadUtilAsSingleton()
                 .AddRunnersManagerAsSingleton();
 
