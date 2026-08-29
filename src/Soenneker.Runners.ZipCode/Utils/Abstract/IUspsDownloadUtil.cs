@@ -10,31 +10,31 @@ namespace Soenneker.Runners.ZipCode.Utils.Abstract;
 public interface IUspsDownloadUtil
 {
     /// <summary>
-    /// Executes the download operation.
+    /// Downloads usps Download.
     /// </summary>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task containing the result of the operation.</returns>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>A task whose result is the text returned by download.</returns>
     ValueTask<string> Download(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets date from html.
     /// </summary>
-    /// <param name="html">The html.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task containing the result of the operation.</returns>
+    /// <param name="html">Rendered page HTML to inspect.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>A task whose result is the requested date Time.</returns>
     ValueTask<DateTime?> GetDateFromHtml(string html, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets last updated date time.
     /// </summary>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task containing the result of the operation.</returns>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>A task whose result is the requested date Time.</returns>
     ValueTask<DateTime?> GetLastUpdatedDateTime(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets directory.
     /// </summary>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task containing the result of the operation.</returns>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>A task whose result is the text returned by get Directory.</returns>
     ValueTask<string> GetDirectory(CancellationToken cancellationToken = default);
 }

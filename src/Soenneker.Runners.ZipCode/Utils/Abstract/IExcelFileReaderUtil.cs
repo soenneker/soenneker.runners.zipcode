@@ -11,8 +11,8 @@ public interface IExcelFileReaderUtil
     /// <summary>
     /// Creates zip codes from xls.
     /// </summary>
-    /// <param name="path">The path.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task containing the result of the operation.</returns>
+    /// <param name="path">Path of the file or directory to use.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>A task whose result is the text returned by create Zip Codes From Xls.</returns>
     ValueTask<string> CreateZipCodesFromXls(string path, CancellationToken cancellationToken = default);
 }
