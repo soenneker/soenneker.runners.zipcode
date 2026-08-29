@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Soenneker.Runners.ZipCode.Utils;
 
-///<inheritdoc cref="IUspsDownloadUtil"/>
+/// <inheritdoc cref="IUspsDownloadUtil"/>
 public sealed class UspsDownloadUtil : IUspsDownloadUtil
 {
     private readonly ILogger<UspsDownloadUtil> _logger;
