@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 
 namespace Soenneker.Runners.ZipCode.Utils;
 
-/// <inheritdoc cref="IUspsDownloadUtil"/>
 public sealed class UspsDownloadUtil : IUspsDownloadUtil
 {
     private readonly ILogger<UspsDownloadUtil> _logger;
@@ -37,7 +36,9 @@ public sealed class UspsDownloadUtil : IUspsDownloadUtil
 
         var uri = $"https://postalpro.usps.com/mnt/glusterfs/{directory}/ZIP_Locale_Detail.xls";
 
-        return (await _fileDownloadUtil.Download(uri, fileExtension: "xls", cancellationToken: cancellationToken))!;
+        string? path = await _fileDownloadUtil.Download(uri, fileExtension: "xls", cancellationToken: cancellationToken);
+
+        return path ?? throw new InvalidOperationException("The USPS ZIP locale workbook could not be downloaded.");
     }
 
     public async ValueTask<DateTime?> GetLastUpdatedDateTime(CancellationToken cancellationToken = default)
@@ -45,7 +46,8 @@ public sealed class UspsDownloadUtil : IUspsDownloadUtil
         _logger.LogInformation("Downloading https://postalpro.usps.com/ZIP_Locale_Detail to get the HTML so we can find the last updated date...");
 
         HttpClient client = await _httpClientCache.Get(nameof(UspsDownloadUtil), cancellationToken: cancellationToken).NoSync();
-        HttpResponseMessage message = await client.GetAsync("https://postalpro.usps.com/ZIP_Locale_Detail", cancellationToken).NoSync();
+        using HttpResponseMessage message = await client.GetAsync("https://postalpro.usps.com/ZIP_Locale_Detail", cancellationToken).NoSync();
+        message.EnsureSuccessStatusCode();
         string html = await message.Content.ReadAsStringAsync(cancellationToken).NoSync();
 
         DateTime? dateTime = await GetDateFromHtml(html, cancellationToken).NoSync();
@@ -64,7 +66,7 @@ public sealed class UspsDownloadUtil : IUspsDownloadUtil
             using IDocument document = await parser.ParseDocumentAsync(html, cancellationToken).NoSync();
             IElement? dateElement = document.QuerySelector("div.mb-2");
 
-            return Convert.ToDateTime(dateElement!.TextContent);
+            return dateElement is null ? null : Convert.ToDateTime(dateElement.TextContent);
         }
         catch (Exception e)
         {
