@@ -33,7 +33,7 @@ public sealed class ExcelFileReaderUtil : IExcelFileReaderUtil
 
         var result = new HashSet<string>();
 
-        await using (FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read))
+        await using (FileStream stream = _fileUtil.OpenRead(path, log: false))
         {
             // Use ExcelDataReader to read the XLS file
             using (IExcelDataReader? reader = ExcelReaderFactory.CreateReader(stream))

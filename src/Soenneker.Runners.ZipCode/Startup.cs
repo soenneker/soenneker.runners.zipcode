@@ -1,4 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
+using Soenneker.Utils.File.Registrars;
+using Soenneker.Utils.Path.Registrars;
 using Soenneker.AngleSharp.Parser.Registrars;
 using Soenneker.Managers.Runners.Registrars;
 using Soenneker.Runners.ZipCode.Utils;
@@ -34,7 +36,9 @@ public class Startup
                 .AddSingleton<IUspsDownloadUtil, UspsDownloadUtil>()
                 .AddAngleSharpParserAsSingleton()
                 .AddFileDownloadUtilAsSingleton()
-                .AddRunnersManagerAsSingleton();
+                .AddRunnersManagerAsSingleton()
+                .AddFileUtilAsSingleton()
+                .AddPathUtilAsSingleton();
 
         return services;
     }
