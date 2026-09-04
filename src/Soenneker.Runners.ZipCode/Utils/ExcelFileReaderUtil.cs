@@ -12,6 +12,7 @@ using Soenneker.Utils.Path.Abstract;
 
 namespace Soenneker.Runners.ZipCode.Utils;
 
+/// <inheritdoc cref="IExcelFileReaderUtil" />
 public sealed class ExcelFileReaderUtil : IExcelFileReaderUtil
 {
     private readonly ILogger<ExcelFileReaderUtil> _logger;
