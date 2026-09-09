@@ -43,7 +43,7 @@
         <PackageReference Include="Soenneker.AngleSharp.Parser" Version="4.0.72" />
         <PackageReference Include="Soenneker.Extensions.LoggerConfiguration" Version="4.0.1371" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
-        <PackageReference Include="Soenneker.Managers.Runners" Version="4.0.2486" />
+        <PackageReference Include="Soenneker.Managers.Runners" Version="4.0.2490" />
         <PackageReference Include="Soenneker.Utils.File.Download" Version="4.0.1743" />
     </ItemGroup>
 </Project>
