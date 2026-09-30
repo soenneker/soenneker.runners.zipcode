@@ -22,7 +22,7 @@ public class UspsDownloadUtilTests : HostedUnitTest
 
     //[LocalOnly]
     [Skip("Manual")]
-    public async Task Download_should_download()
+    public async ValueTask Download_should_download()
     {
         string result = await _util.Download();
         result.Should()
