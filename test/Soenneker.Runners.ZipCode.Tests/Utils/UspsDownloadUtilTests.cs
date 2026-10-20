@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using AwesomeAssertions;
 using Soenneker.Runners.ZipCode.Utils.Abstract;
@@ -18,6 +19,15 @@ public class UspsDownloadUtilTests : HostedUnitTest
     [Test]
     public void Default()
     {
+    }
+
+    [Test]
+    public async ValueTask GetDateFromHtml_skips_breadcrumbs()
+    {
+        DateTime? result = await _util.GetDateFromHtml(
+            "<div class='breadcrumbs mb-2'>Home / ZIP Locale Detail</div><div class='mb-2'>October 01, 2026</div>");
+
+        result.Should().Be(new DateTime(2026, 10, 1));
     }
 
     //[LocalOnly]

@@ -8,13 +8,14 @@ using Soenneker.Runners.ZipCode.Utils.Abstract;
 using Soenneker.Utils.File.Download.Abstract;
 using Soenneker.Utils.HttpClientCache.Abstract;
 using System;
+using System.Globalization;
+using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Soenneker.Runners.ZipCode.Utils;
 
-/// <inheritdoc cref="IUspsDownloadUtil" />
 public sealed class UspsDownloadUtil : IUspsDownloadUtil
 {
     private readonly ILogger<UspsDownloadUtil> _logger;
@@ -33,11 +34,31 @@ public sealed class UspsDownloadUtil : IUspsDownloadUtil
 
     public async ValueTask<string> Download(CancellationToken cancellationToken = default)
     {
-        string directory = await GetDirectory(cancellationToken);
+        HttpClient client = await _httpClientCache.Get(nameof(UspsDownloadUtil), cancellationToken: cancellationToken).NoSync();
+        string html = await client.GetStringAsync("https://postalpro.usps.com/ZIP_Locale_Detail", cancellationToken).NoSync();
+        HtmlParser parser = await _angleSharpParser.Get(cancellationToken).NoSync();
+        using IDocument document = await parser.ParseDocumentAsync(html, cancellationToken).NoSync();
+        Uri? workbookUri = null;
+        foreach (IElement link in document.QuerySelectorAll("a[href]"))
+        {
+            if (!Uri.TryCreate(new Uri("https://postalpro.usps.com/ZIP_Locale_Detail"), link.GetAttribute("href"), out Uri? candidate))
+                continue;
 
-        var uri = $"https://postalpro.usps.com/mnt/glusterfs/{directory}/ZIP_Locale_Detail.xls";
+            string fileName = Path.GetFileName(candidate.AbsolutePath);
+            if (candidate.Scheme == Uri.UriSchemeHttps && candidate.Host == "postalpro.usps.com" &&
+                (fileName.Equals("ZIP_Locale_Detail.xls", StringComparison.OrdinalIgnoreCase) ||
+                 fileName.Equals("ZIP_Locale_Detail.xlsx", StringComparison.OrdinalIgnoreCase)))
+            {
+                workbookUri = candidate;
+                break;
+            }
+        }
 
-        string? path = await _fileDownloadUtil.Download(uri, fileExtension: "xls", cancellationToken: cancellationToken);
+        if (workbookUri is null)
+            throw new InvalidOperationException("The USPS page does not contain a ZIP locale workbook download link.");
+
+        string? path = await _fileDownloadUtil.Download(workbookUri.AbsoluteUri,
+            fileExtension: Path.GetExtension(workbookUri.AbsolutePath).TrimStart('.'), cancellationToken: cancellationToken);
 
         return path ?? throw new InvalidOperationException("The USPS ZIP locale workbook could not be downloaded.");
     }
@@ -65,9 +86,14 @@ public sealed class UspsDownloadUtil : IUspsDownloadUtil
         try
         {
             using IDocument document = await parser.ParseDocumentAsync(html, cancellationToken).NoSync();
-            IElement? dateElement = document.QuerySelector("div.mb-2");
+            foreach (IElement dateElement in document.QuerySelectorAll("div.mb-2"))
+            {
+                if (DateTime.TryParse(dateElement.TextContent.Trim(), CultureInfo.GetCultureInfo("en-US"),
+                        DateTimeStyles.None, out DateTime date))
+                    return date;
+            }
 
-            return dateElement is null ? null : Convert.ToDateTime(dateElement.TextContent);
+            return null;
         }
         catch (Exception e)
         {
