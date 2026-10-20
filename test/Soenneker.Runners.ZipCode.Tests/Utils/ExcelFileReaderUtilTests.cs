@@ -16,12 +16,26 @@ public class ExcelFileReaderUtilTests : HostedUnitTest
         _util = Resolve<IExcelFileReaderUtil>();
     }
 
-    [Skip("Manual")]
-    //[LocalOnly]
+    [Test]
     public async ValueTask GetZipCodesFromXls_should_parse()
     {
         string result = await _util.CreateZipCodesFromXls(Path.Combine("Resources", "ZIP_Locale_Detail.xls"), System.Threading.CancellationToken.None);
         result.Should().NotBeNull();
+    }
+
+    [Test]
+    public async ValueTask GetZipCodesFromXlsx_finds_column_and_preserves_leading_zeroes()
+    {
+        string result = await _util.CreateZipCodesFromXls(Path.Combine("Resources", "ZIP_Locale_Detail.xlsx"));
+        try
+        {
+            string[] codes = await File.ReadAllLinesAsync(result);
+            codes.Should().BeEquivalentTo("00501", "90210");
+        }
+        finally
+        {
+            File.Delete(result);
+        }
     }
 }
 

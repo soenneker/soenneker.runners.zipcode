@@ -46,9 +46,25 @@ public sealed class ExcelFileReaderUtil : IExcelFileReaderUtil
                 // in each DataTable in the DataSet
                 foreach (DataTable table in dataSet.Tables)
                 {
-                    if (table.TableName != "ZIP_DETAIL") 
+                    if (table.TableName != "ZIP_DETAIL" && table.TableName != "ZIP_Locale")
                         continue;
-                    
+
+                    if (table.Rows.Count == 0)
+                        continue;
+
+                    int zipColumn = -1;
+                    for (int column = 0; column < table.Columns.Count; column++)
+                    {
+                        if (table.Rows[0][column].ToString()?.Trim() == "DELIVERY ZIPCODE")
+                        {
+                            zipColumn = column;
+                            break;
+                        }
+                    }
+
+                    if (zipColumn < 0)
+                        throw new InvalidDataException("The USPS workbook is missing the DELIVERY ZIPCODE column.");
+
                     var count = 0;
 
                     foreach (DataRow row in table.Rows)
@@ -56,16 +72,12 @@ public sealed class ExcelFileReaderUtil : IExcelFileReaderUtil
                         count++;
 
                         if (count == 1)
-                        {
-                            if (row[4].ToString() != "DELIVERY ZIPCODE")
-                                throw new Exception("The format of the file has changed, address immediately");
-
                             continue;
-                        }
 
-                        var deliveryZip = row[4].ToString();
+                        var deliveryZip = row[zipColumn].ToString()?.Trim();
 
-                        result.Add(deliveryZip!);
+                        if (!string.IsNullOrEmpty(deliveryZip))
+                            result.Add(deliveryZip.PadLeft(5, '0'));
                     }
 
                     _logger.LogDebug("Completed parsing Zip codes");
